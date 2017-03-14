@@ -1,0 +1,35 @@
+#Author : Ratik Bhat
+#Poker ANN predics Hand on the based of Given Input 
+#Dataset From : https://archive.ics.uci.edu/ml/datasets/Poker+Hand
+
+from pybrain.tools.shortcuts import buildNetwork
+from pybrain.datasets import SupervisedDataSet
+from pybrain.supervised.trainers import BackpropTrainer
+import pandas as pd
+import pickle
+
+fileObject = open('pokerann', 'w')
+
+#sampeling the data
+keys = ["So1","Ro1","So2","Ro2","So3","Ro3","So4","Ro4","So5","Ro5","ph"]
+trainData = pd.read_csv("./train.data",sep=",",names=keys)
+
+#building the pybrain network
+nueralNetwork = buildNetwork(10,5,4,1)
+
+#creating a pybrain supervised dataset
+dataSet = SupervisedDataSet(10,1)
+for i in range(0,25010):
+	print('\r Creating Dataset :  %d rows read'  % i)
+	dataSet.addSample((trainData["So1"][i],trainData["Ro1"][i],trainData["So2"][i],trainData["Ro2"][i],trainData["So3"][i],trainData["Ro3"][i],trainData["So4"][i],trainData["Ro4"][i],trainData["So5"][i],trainData["Ro5"][i]),(trainData["ph"][i],))
+
+#pybrain backPropagation trainer
+trainer = BackpropTrainer(nueralNetwork , dataSet)
+
+#this gets better with more number of iterations
+for i in range(1,5):
+	print("\r Iteration No: %d" % i)
+	trainer.train()
+pickle.dump(nueralNetwork, fileObject)
+fileObject.close()
+
